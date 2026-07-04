@@ -131,7 +131,17 @@ For a distributed version, I would move the counter state to Redis and perform t
 
 ## AI Usage
 
-AI assistance was used during development to speed up implementation and testing support. The final code was manually reviewed, corrected, and validated.
+AI assistance was used during development to speed up implementation and testing support.
+
+Tool used: OpenAI Codex
+
+Example prompts used:
+
+- "Review the rate limiter implementation against the case study requirements."
+- "Check whether the test coverage includes headers, 429 behavior, independent clients, reset behavior, and endpoint-specific limits."
+- "Identify any missing validation or correctness gaps before submission."
+
+The final code was manually reviewed, corrected, and validated.
 
 Correctness was validated using:
 
