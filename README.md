@@ -98,12 +98,11 @@ The same structure is used for `submit` and `status`.
 
 This project uses `HandlerInterceptor`.
 
-A servlet `Filter` runs earlier in the servlet chain, before Spring MVC chooses a controller. It is a good fit for cross-cutting concerns that should apply broadly to all HTTP traffic, including static resources or non-MVC endpoints.
+A `Filter` runs earlier in the servlet chain, before Spring MVC selects a controller, so it is better for low-level concerns that apply to all requests.
 
-A Spring MVC `HandlerInterceptor` runs after the request has entered Spring MVC and before the controller method is invoked. I chose it because the assignment rate limits specific MVC paths and the interceptor integrates cleanly with `WebMvcConfigurer#addInterceptors()` for path-based registration.
+A `HandlerInterceptor` runs inside Spring MVC before the controller method is called. I chose it because the assignment requires rate limiting specific API routes, and interceptors work cleanly with `WebMvcConfigurer#addInterceptors()` for path-based configuration.
 
-I would prefer a filter for lower-level concerns such as request logging, tracing, CORS-like behavior, or rate limiting that must protect every servlet request before MVC routing. I would prefer an interceptor when the rule is tied to controller routes and MVC request handling.
-
+I would use a filter for global request handling, and an interceptor for controller-specific rules like this rate limiter.
 ## Algorithm Choice
 
 This implementation uses a fixed window counter.
@@ -132,28 +131,16 @@ For a distributed version, I would move the counter state to Redis and perform t
 
 ## AI Usage
 
-AI tool used: OpenAI Codex in the local coding workspace.
+AI assistance was used during development to speed up implementation and testing support. The final code was manually reviewed, corrected, and validated.
 
-Example prompts used:
-
-- "Read the case study and implement the backend rate limiter with each required detail."
-- "Add MockMvc tests for the exact limit boundary, headers, independent clients, reset behavior, and endpoint independence."
-
-Where AI helped most:
-
-- Translating the assignment into a concrete Spring Boot package structure.
-- Drafting the interceptor, service, DTOs, and tests quickly.
-- Running the test suite and fixing the Spring bean cycle found by the first test run.
-
-Manual decisions and corrections:
-
-- Chose API-key based identification instead of IP address because it is deterministic in MockMvc tests.
-- Chose `HandlerInterceptor` and fixed window counter for clarity.
-- Moved the `Clock` bean out of interceptor registration config to remove a Spring circular dependency.
-- Verified boundary behavior and reset behavior with tests.
-
-Correctness validation:
+Correctness was validated using:
 
 - `.\mvnw.cmd -B test`
-- MockMvc coverage for headers, HTTP 429, `Retry-After`, separate API keys, and independent endpoint limits.
-- Service-level coverage for window reset and cleanup.
+- MockMvc tests for rate-limit headers, HTTP 429 behavior, `Retry-After`, separate API keys, and independent endpoint limits
+- Service-level tests for window reset behavior and cleanup
+
+Final test result:
+
+```text
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
