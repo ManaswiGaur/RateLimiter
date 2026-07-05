@@ -30,9 +30,9 @@ class ApiControllerTest {
         mockMvc.perform(get("/api/general").header(RateLimitInterceptor.API_KEY_HEADER, apiKey))
                 .andExpect(status().isOk())
                 .andExpect(header().string(RateLimitInterceptor.API_KEY_HEADER, apiKey))
-                .andExpect(header().string("X-RateLimit-Limit", "20"))
-                .andExpect(header().string("X-RateLimit-Remaining", "19"))
-                .andExpect(header().exists("X-RateLimit-Reset"))
+                .andExpect(header().string(RateLimitInterceptor.RATE_LIMIT_LIMIT_HEADER, "20"))
+                .andExpect(header().string(RateLimitInterceptor.RATE_LIMIT_REMAINING_HEADER, "19"))
+                .andExpect(header().exists(RateLimitInterceptor.RATE_LIMIT_RESET_HEADER))
                 .andExpect(jsonPath("$.message").value("OK"));
     }
 
@@ -47,8 +47,8 @@ class ApiControllerTest {
 
         mockMvc.perform(get("/api/general").header(RateLimitInterceptor.API_KEY_HEADER, apiKey))
                 .andExpect(status().isTooManyRequests())
-                .andExpect(header().string("X-RateLimit-Limit", "20"))
-                .andExpect(header().string("X-RateLimit-Remaining", "0"))
+                .andExpect(header().string(RateLimitInterceptor.RATE_LIMIT_LIMIT_HEADER, "20"))
+                .andExpect(header().string(RateLimitInterceptor.RATE_LIMIT_REMAINING_HEADER, "0"))
                 .andExpect(header().string(HttpHeaders.RETRY_AFTER, not("0")))
                 .andExpect(jsonPath("$.error").value("Too many requests"))
                 .andExpect(jsonPath("$.retryAfterSeconds", greaterThanOrEqualTo(1)));
@@ -69,7 +69,7 @@ class ApiControllerTest {
 
         mockMvc.perform(post("/api/submit").header(RateLimitInterceptor.API_KEY_HEADER, otherKey))
                 .andExpect(status().isOk())
-                .andExpect(header().string("X-RateLimit-Remaining", "4"));
+                .andExpect(header().string(RateLimitInterceptor.RATE_LIMIT_REMAINING_HEADER, "4"));
     }
 
     @Test
@@ -86,8 +86,8 @@ class ApiControllerTest {
 
         mockMvc.perform(get("/api/general").header(RateLimitInterceptor.API_KEY_HEADER, apiKey))
                 .andExpect(status().isOk())
-                .andExpect(header().string("X-RateLimit-Limit", "20"))
-                .andExpect(header().string("X-RateLimit-Remaining", "19"));
+                .andExpect(header().string(RateLimitInterceptor.RATE_LIMIT_LIMIT_HEADER, "20"))
+                .andExpect(header().string(RateLimitInterceptor.RATE_LIMIT_REMAINING_HEADER, "19"));
     }
 
     @Test

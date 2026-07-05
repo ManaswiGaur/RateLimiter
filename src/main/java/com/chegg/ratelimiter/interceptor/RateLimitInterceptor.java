@@ -20,6 +20,9 @@ import java.util.Optional;
 public class RateLimitInterceptor implements HandlerInterceptor {
 
     public static final String API_KEY_HEADER = "X-API-Key";
+    public static final String RATE_LIMIT_LIMIT_HEADER = "X-RateLimit-Limit";
+    public static final String RATE_LIMIT_REMAINING_HEADER = "X-RateLimit-Remaining";
+    public static final String RATE_LIMIT_RESET_HEADER = "X-RateLimit-Reset";
 
     private final RateLimitProperties properties;
     private final RateLimiterService rateLimiterService;
@@ -69,9 +72,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     private void writeRateLimitHeaders(HttpServletResponse response, String apiKey, RateLimitResult result) {
         response.setHeader(API_KEY_HEADER, apiKey);
-        response.setHeader("X-RateLimit-Limit", String.valueOf(result.limit()));
-        response.setHeader("X-RateLimit-Remaining", String.valueOf(result.remaining()));
-        response.setHeader("X-RateLimit-Reset", String.valueOf(result.resetAt()));
+        response.setHeader(RATE_LIMIT_LIMIT_HEADER, String.valueOf(result.limit()));
+        response.setHeader(RATE_LIMIT_REMAINING_HEADER, String.valueOf(result.remaining()));
+        response.setHeader(RATE_LIMIT_RESET_HEADER, String.valueOf(result.resetAt()));
     }
 
     private void writeTooManyRequests(HttpServletResponse response, RateLimitResult result) throws IOException {

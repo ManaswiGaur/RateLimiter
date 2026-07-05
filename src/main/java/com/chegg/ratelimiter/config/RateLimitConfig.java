@@ -1,7 +1,6 @@
 package com.chegg.ratelimiter.config;
 
 import com.chegg.ratelimiter.interceptor.RateLimitInterceptor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -20,6 +19,11 @@ public class RateLimitConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         var registration = registry.addInterceptor(interceptor);
-        properties.endpoints().values().forEach(rule -> registration.addPathPatterns(rule.path()));
+        properties.endpoints()
+                .values()
+                .stream()
+                .map(RateLimitProperties.EndpointRule::path)
+                .distinct()
+                .forEach(registration::addPathPatterns);
     }
 }
